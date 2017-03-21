@@ -10,4 +10,4 @@ class User(object):
         return self._username
 
     def add_product_review(self, product, string):
-        product.add_review(self._username, "says:",string)
+        product.add_review(self._username, "says:", string)

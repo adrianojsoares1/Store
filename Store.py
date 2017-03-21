@@ -15,13 +15,15 @@ class Store:
         self.login = {}
         self.users = {}
         self.current_user = None
+        self.categories = {"Physical": ["Computers", "Monitors", "Textbooks"],
+                           "Digital": ["Gift Cards", "Steam Codes", "E-books"],
+                           "Subscription": ["Classes", "Anti-virus", "Video Streaming"]}
         self.add_administrator("Adriano", "Gvr8Phc")
 
-
-    def _add_user(self, name, password, type):
-        if type == "Administrator":
+    def _add_user(self, name, password, acct_type):
+        if acct_type == "Administrator":
             temp = Administrator(name)
-        elif type == "Customer":
+        elif acct_type == "Customer":
             temp = Customer(name)
         else:
             raise ValueError("Not a valid type!")
@@ -50,7 +52,22 @@ class Store:
         else:
             raise ValueError("'None' is not a valid user!")
 
+    def user_login(self, username, pass_code):
+        try:
+            if self.login.get(username) is not None:
+                new_pass = hashlib.sha512(str.encode(pass_code))
+                if new_pass is self.login[username]:
+                    self.current_user = self.users[new_pass]
+                else:
+                    raise LookupError("Password is incorrect!")
+            else:
+                raise LookupError("Username not found!")
+        except Exception as e:
+            print(str(e))
 
 s = Store()
 s.add_administrator("Nick", "password")
-print(s.login["Adriano"])
+s.user_login("Adriano", "Gvr8Phc")
+#print(s.current_user.get_username())
+dicto = {"hey": "what"}
+
