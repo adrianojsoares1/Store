@@ -7,10 +7,12 @@ from .Subscription_Product import Subscription_Product
 class User:
 
     def __init__(self):
-        self.cart = []
+        self.user = "stringa'"
 
-    def add_to_cart(self, item):
-        self.cart.append(item)
 
-    def delete_from_cart(self, item):
-        self.cart.remove(item)
+
+
+
+
+
+
