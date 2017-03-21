@@ -1,18 +1,13 @@
-from .Product import Product
-from .Digital_Product import Digital_Product
-from .Physical_Product import Physical_Product
-from .Subscription_Product import Subscription_Product
+class User(object):
 
+    def __init__(self, username):
+        self._username = username
 
-class User:
+    def set_user(self, new_name):
+        self._username = new_name
 
-    def __init__(self):
-        self.user = "stringa'"
+    def get_username(self):
+        return self._username
 
-
-
-
-
-
-
-
+    def add_product_review(self, product, string):
+        product.add_review(self._username, "says:",string)

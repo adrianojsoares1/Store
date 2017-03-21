@@ -3,10 +3,10 @@ from .User import User
 
 class Customer(User):
 
-    def __init__(self):
+    def __init__(self, username):
         self.cart = [None]
         self.balance = 0
-        User.__init__(self)
+        User.__init__(self, username)
 
     def add_to_cart(self, item):
         if len(self.cart) == 1:
