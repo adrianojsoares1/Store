@@ -30,17 +30,17 @@ class Product(object):
     def get_image(self):
         return self.image
 
-    def set_name(self, str):
-        self.name = str
+    def set_name(self, stri):
+        self.name = stri
 
-    def set_description(self, str):
-        self.description = str
+    def set_description(self, stri):
+        self.description = stri
 
     def set_price(self, integer):
         self.price = integer
 
     def add_review(self, rev):
-        if len(self.reviews) == 1:
+        if self.reviews[0] == "None":
             self.reviews[0] = rev
         else:
             self.reviews.append(rev)

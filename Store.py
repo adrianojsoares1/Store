@@ -15,10 +15,18 @@ class Store:
         self.login = {}
         self.users = {}
         self.current_user = None
-        self.categories = {"Physical": ["Computers", "Monitors", "Textbooks"],
-                           "Digital": ["Gift Cards", "Steam Codes", "E-books"],
-                           "Subscription": ["Classes", "Anti-virus", "Video Streaming"]}
-        self.add_administrator("Adriano", "Gvr8Phc")
+        self.categories = {"Physical": {"Computers": [],
+                                        "Monitors": [],
+                                        "Textbooks": []},
+                           "Digital": {"Gift Cards": [],
+                                       "Steam Codes": [],
+                                       "E-books": []},
+                           "Subscription": {"Classes": [],
+                                            "Anti-virus": [],
+                                            "Video Streaming": []}
+                           }
+
+        self.purchase_log = {}
 
     def _add_user(self, name, password, acct_type):
         if acct_type == "Administrator":
@@ -62,8 +70,53 @@ class Store:
                     raise LookupError("Password is incorrect!")
             else:
                 raise LookupError("Username not found!")
-        except Exception as e:
+        except LookupError as e:
             print(str(e))
+
+    def user_logout(self):
+        self.current_user = None
+
+    def add_category(self, master_cat, new_sub_cat):
+        try:
+            self.check_permission()
+            if self.categories.get(master_cat) is not None:
+                self.categories[master_cat][new_sub_cat] = []
+            else:
+                raise FileExistsError("Entry already exists or is not valid.")
+        except BaseException as e:
+            print(str(e))
+
+    def add_product(self, product):
+        try:
+            self.check_permission()
+            key = ""
+            if type(product) is "Physical_Product":
+                key = "Physical"
+            elif type(product) is "Digital_Product":
+                key = "Digital"
+            elif type(product) is "Subscription_Product":
+                key = "Subscription"
+            self.categories[key][product.get_category()].append(product)
+        except PermissionError as e:
+            print(e)
+
+    def check_permission(self):
+        if type(self.current_user) is not "Administrator":
+            raise PermissionError("Only administrators can modify this field.")
+
+    def set_product_price(self, product, new_price):
+        try:
+            self.check_permission()
+            product.set_price(new_price)
+        except PermissionError as e:
+            print(e)
+
+    def restock(self, product, new_quantity):
+        try:
+            self.check_permission()
+            product.set_quantity((product.get_quantity + new_quantity))
+        except PermissionError as e:
+            print(e)
 
 s = Store()
 s.add_administrator("Nick", "password")

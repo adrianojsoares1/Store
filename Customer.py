@@ -4,7 +4,7 @@ from .User import User
 class Customer(User):
 
     def __init__(self, username):
-        self.cart = [None]
+        self.cart = []
         self.balance = 0
         User.__init__(self, username)
 
@@ -23,12 +23,21 @@ class Customer(User):
     def retract_funds(self, amt):
         self.balance -= amt
 
+    def get_cart(self):
+        return self.cart
+
+    def get_balance(self):
+        return self.balance
+
     def purchase(self):
         cart_total = 0
         for i in self.cart:
             cart_total += i.get_price()
-
         if cart_total > self.balance:
             raise ValueError("Not enough funds to complete transaction.")
         else:
+            for i in self.cart:
+                if type(i) is "Physical_Product":
+                    i.buy_1()
             self.balance -= cart_total
+            self.cart = []

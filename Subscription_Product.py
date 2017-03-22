@@ -1,4 +1,4 @@
-from .Product import Product
+from Web_Store.Product import Product
 import datetime
 from datetime import date
 

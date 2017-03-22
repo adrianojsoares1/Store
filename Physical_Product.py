@@ -15,3 +15,12 @@ class Physical_Product(Product):
 
     def set_ship_time(self, new_time):
         self.ship_time = new_time
+
+    def set_quantity(self, new):
+        self.quantity = new
+
+    def get_quantity(self):
+        return self.quantity
+
+    def buy_1(self):
+        self.quantity -= 1
