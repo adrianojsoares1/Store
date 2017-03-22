@@ -118,9 +118,3 @@ class Store:
         except PermissionError as e:
             print(e)
 
-s = Store()
-s.add_administrator("Nick", "password")
-s.user_login("Adriano", "Gvr8Phc")
-#print(s.current_user.get_username())
-dicto = {"hey": "what"}
-
