@@ -29,15 +29,18 @@ class Customer(User):
     def get_balance(self):
         return self.balance
 
-    def purchase(self):
-        cart_total = 0
+    def get_cart_total(self):
+        sm = 0
         for i in self.cart:
-            cart_total += i.get_price()
-        if cart_total > self.balance:
+            sm += i.get_price()
+        return sm
+
+    def purchase(self):
+        if self.get_cart_total() > self.balance:
             raise ValueError("Not enough funds to complete transaction.")
         else:
             for i in self.cart:
                 if type(i) is "Physical_Product":
                     i.buy_1()
-            self.balance -= cart_total
+            self.balance -= self.get_cart_total()
             self.cart = []

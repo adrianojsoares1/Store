@@ -1,9 +1,7 @@
-#from .Product import Product
-#from .Digital_Product import Digital_Product
-#from .Physical_Product import Physical_Product
-#from .Subscription_Product import Subscription_Product
+from Web_Store.Digital_Product import Digital_Product
+from Web_Store.Physical_Product import Physical_Product
+from Web_Store.Subscription_Product import Subscription_Product
 import hashlib
-from Web_Store.User import *
 from Web_Store.Customer import *
 from Web_Store.Administrator import *
 
@@ -15,7 +13,7 @@ class Store:
         self.login = {}
         self.users = {}
         self.current_user = None
-        self.categories = {"Physical": {"Computers": [],
+        self.categories = {"Physical": {"Computers": [Physical_Product()],
                                         "Monitors": [],
                                         "Textbooks": []},
                            "Digital": {"Gift Cards": [],
@@ -94,18 +92,18 @@ class Store:
         try:
             self.check_permission()
             key = ""
-            if type(product) is "Physical_Product":
+            if type(product) is Physical_Product:
                 key = "Physical"
-            elif type(product) is "Digital_Product":
+            elif type(product) is Digital_Product:
                 key = "Digital"
-            elif type(product) is "Subscription_Product":
+            elif type(product) is Subscription_Product:
                 key = "Subscription"
             self.categories[key][product.get_category()].append(product)
         except PermissionError as e:
             print(e)
 
     def check_permission(self):
-        if type(self.current_user) is not "Administrator":
+        if type(self.current_user) is not Administrator:
             raise PermissionError("Only administrators can modify this field.")
 
     def set_product_price(self, product, new_price):
@@ -121,3 +119,11 @@ class Store:
             product.set_quantity((product.get_quantity + new_quantity))
         except PermissionError as e:
             print(e)
+
+'''
+s = Store()
+s.add_administrator("Adriano", "Gvr8Phc")
+s.user_login("Adriano", "Gvr8Phc")
+print(s.current_user.get_username())
+print(type(s.current_user) == Administrator)
+'''
