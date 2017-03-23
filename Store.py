@@ -28,6 +28,9 @@ class Store:
 
         self.purchase_log = {}
 
+    def get_categories(self):
+        return self.categories
+
     def _add_user(self, name, password, acct_type):
         if acct_type == "Administrator":
             temp = Administrator(name)
@@ -36,11 +39,11 @@ class Store:
         else:
             raise ValueError("Not a valid type!")
 
-        password = str.encode(password)
-        hashed_pass = hashlib.sha512(password)
+        # password = str.encode(password)
+        # hashed_pass = hashlib.sha512(password)
 
-        self.login[name] = hashed_pass
-        self.users[hashed_pass] = temp
+        self.login[name] = password
+        self.users[password] = temp
 
     def add_administrator(self, name, password):
         self._add_user(name, password, "Administrator")
@@ -50,28 +53,29 @@ class Store:
 
     def change_user_password(self, new_pass):
         if self.current_user is not None:
-            temp_pass = hashlib.sha512(str.encode(new_pass))
+            # temp_pass = hashlib.sha512(str.encode(new_pass))
 
             del self.users[self.login[self.current_user.get_username()]]  # because key is immutable
 
-            self.login[self.current_user.get_username()] = temp_pass  # Set new login pass
+            self.login[self.current_user.get_username()] = new_pass  # Set new login pass
 
-            self.users[temp_pass] = self.current_user  # add new dict entry
+            self.users[new_pass] = self.current_user  # add new dict entry
         else:
             raise ValueError("'None' is not a valid user!")
 
     def user_login(self, username, pass_code):
         try:
             if self.login.get(username) is not None:
-                new_pass = hashlib.sha512(str.encode(pass_code))
-                if new_pass is self.login[username]:
-                    self.current_user = self.users[new_pass]
+                # new_pass = hashlib.sha512(str.encode(pass_code))
+                if pass_code == self.login[username]:
+                    self.current_user = self.users[pass_code]
                 else:
-                    raise LookupError("Password is incorrect!")
+                    raise LookupError("Password is incorrect!\n")
             else:
-                raise LookupError("Username not found!")
+                raise LookupError("Username not found!\n")
         except LookupError as e:
-            print(str(e))
+            return str(e)
+        return "Login Successful"
 
     def user_logout(self):
         self.current_user = None
@@ -117,4 +121,3 @@ class Store:
             product.set_quantity((product.get_quantity + new_quantity))
         except PermissionError as e:
             print(e)
-
