@@ -9,7 +9,7 @@ s = Store()
 
 def login_menu():
     while True:
-        print("Welcome to <store_name>.")
+        print("Welcome to the Store.")
         choice = int(input("Enter 1 to login.\nEnter 2 to create new account.\nEnter 3 to quit.\nEnter:"))
         if choice == 1:
             user = input("Please log in.\nEnter username:")
@@ -25,7 +25,7 @@ def login_menu():
                 pass1 = input("Enter a password:")
                 pass2 = input("Confirm password:")
                 if pass1 == pass2:
-                    print("Welcome to <store_name>,", user, '!')
+                    print("Welcome to the store" + str(user) + '!')
                     s.add_customer(user, pass1)
                     break
                 else:
@@ -35,10 +35,10 @@ def login_menu():
 
 
 def customer_main_menu():
-    print("Main Menu.")
     while True:
-        choice = int(input("\nEnter 1 to shop\nEnter 2 to add money\nEnter 3 to change password\nEnter 4 to view cart\n"
-                           "Enter 5 to logout."))
+        print("\nMain Menu.\n")
+        choice = int(input("Enter 1 to shop\nEnter 2 to add money\nEnter 3 to change password\nEnter 4 to view cart\n"
+                           "Enter 5 to logout.\n\nEnter:"))
         if choice == 1:
             shop_menu()
         elif choice == 2:
@@ -53,49 +53,67 @@ def customer_main_menu():
 
 
 def shop_menu():
-    print("\nShop Menu.")
-    dictry = s.get_categories()
-    count = 1
-    keys = []
-    for i in dictry:
-        for j in dictry[i]:
-            print(count, ".", j)
-            keys.append(j)
-            count += 1
-    choice = int(input("Enter:"))
+    while True:
+        print("Shop Menu.")
+        dictry = s.get_categories()
+        count = 1
+        keys = []
+        print("0 . Go Back")
+        for i in dictry:
+            for j in dictry[i]:
+                print(count, ".", j)
+                keys.append(j)
+                count += 1
 
-    chosen_item_str = keys[choice - 1]
+        choice = int(input("Enter:"))
 
-    sub_cat = []
-    for i in dictry:
-        if dictry[i].get(chosen_item_str) is not None:
-            sub_cat = dictry[i][chosen_item_str]
+        if choice == 0:
+            break
 
-    for i in range(0, len(sub_cat)):
-        print((i + 1), ".", sub_cat[i].to_string())
+        chosen_item_str = keys[choice - 1]
 
-    choice = int(input("Enter:"))
+        sub_cat = []
+        for i in dictry:
+            if dictry[i].get(chosen_item_str) is not None:
+                sub_cat = dictry[i][chosen_item_str]
 
-    if choice in range(1, len(sub_cat)):
-        print(sub_cat[choice - 1].toString())
+        for i in range(0, len(sub_cat)):
+            print((i + 1), ".", sub_cat[i].to_string())
+        while True:
+            choice = int(input("0 . Go Back\nEnter:"))
+            if choice == 0:
+                break
 
-    add2cart = int(input("1. to add to cart\n2. Go back.\nEnter:"))
-    if add2cart == 1:
-        s.current_user.add_to_cart(sub_cat[choice - 1])
+            if choice in range(0, (1 + len(sub_cat))):
+                print(sub_cat[choice - 1].to_string())
+
+            add2cart = int(input("1. to add to cart\n2. Go back.\nEnter:"))
+            if add2cart == 1:
+                if type(sub_cat[choice - 1]) is Physical_Product and sub_cat[choice - 1].get_quantity() == 0:
+                    print("Out of Stock!")
+                    break
+                else:
+                    s.current_user.add_to_cart(sub_cat[choice - 1])
+                    print("Item added to cart!")
+                    break
+            elif add2cart == 2:
+                break
 
 
 def add_money_menu():
     print("Your current account balance is:", s.current_user.get_balance())
     ad = int(input("Enter money to add:"))
     s.current_user.add_to_balance(ad)
+    print(ad, "dollars have been deducted from bank account. New balance:", s.current_user.get_balance())
 
 
 def change_pass_menu():
     while True:
         pw = input("Enter your current password:")
-        if s.login(s.current_user.get_username(), pw):
+        if s.user_login(s.current_user.get_username(), pw) == "Login Successful":
             nw_pw = input("Enter new password:")
             s.change_user_password(nw_pw)
+            print("Password has been changed successfully.")
             break
         else:
             print("Current password is incorrect.")
@@ -104,13 +122,18 @@ def change_pass_menu():
 def view_cart_menu():
     tmp = s.current_user.get_cart()
     print("Cart for user", s.current_user.get_username(), ":")
-    for i in range(1, len(tmp)):
-        print(i, ".", tmp[i])
+    if len(tmp) < 1:
+        print("Cart is empty!")
+    else:
+        for i in range(0, len(tmp)):
+            print(tmp[i].to_string())
 
-    print("1. Checkout (Your total comes to: $", s.current_user.get_cart_total(), ")\n2. Quit")
-    imp = int(input("Enter: "))
-    if imp == 1:
-        s.current_user.purchase()
+        print("1 . Checkout (Your total comes to: $", s.current_user.get_cart_total(), ")\n2 . Quit")
+        imp = int(input("Enter: "))
+        if imp == 1:
+            s.user_purchase()
+            print("Items have been purchased and will be shipped / emailed to you shortly!")
+
 
 
 def admin_menu():
@@ -129,7 +152,7 @@ def admin_menu():
         elif choice == 5:
             delete_item_menu()
         elif choice == 6:
-            pass
+            view_logs_menu()
         elif choice == 7:
             set_category_menu()
         elif choice == 8:
@@ -234,11 +257,22 @@ def restock_item_menu():
                 if s.categories[i][j][k].get_name() == name:
                     s.restock(s.categories[i][j][k], amt)
                     temp = s.categories[i][j][k]
-                    print("New Amount for", name, ":", temp.get_quantity())
                     return True
     print("Not found, or item does not have value \"Stock\".")
     return False
 
+def view_logs_menu():
+    print("Item purchase logs: ")
+    for i in s.get_purchases():
+        print(i)
+
+    print("\nComplete Product Listing: ")
+    for i in s.get_products():
+        print(i)
+
+    print()
+    for i in s.get_activity():
+        print(i)
 
 def add_item_menu():
     name = input("\nEnter product name:")
@@ -282,6 +316,46 @@ def add_item_menu():
 if __name__ == "__main__":
     s.add_administrator("me", "pass")
     s.add_customer("adr", "pet")
+
+    products = [
+        Physical_Product(100, "Macbook", "2016 Model Macbook Pro.", 2000, "Computers"),
+        Physical_Product(100, "Surface Pro", "2016 Model Microsoft Surface Pro.", 1500, "Computers"),
+
+        Physical_Product(100, "ASUS VSQ74", "24 inch 1080p monitor", 100, "Monitors"),
+        Physical_Product(100, "BenQ Gaming Monitor", "25 inch 4k monitor", 400, "Monitors"),
+
+        Physical_Product(100, "Python Essentials", "Learn the basics of python with this intuitive guide!", 30,
+                         "Textbooks"),
+        Physical_Product(100, "Intro to C++", "Learn the basics of C++ and OOP!", 50, "Textbooks"),
+
+        Subscription_Product("Programming Class", "A class to teach programming.", 100, "Classes", None, 90,
+                             "a_link.com"),
+
+        Subscription_Product("Malwarebytes", "Defend against malware!", 40, "Anti-virus", None, 90,
+                             "malwarebytes.com"),
+        Subscription_Product("Norton", "Like malwarebytes, but shittier.", 20, "Anti-virus", None, 90,
+                             "symmantec.com"),
+
+        Subscription_Product("Netflix", "Watch cool movies and stuff.", 10, "Video Streaming", None, 30,
+                             "netflix.com"),
+        Subscription_Product("Prime Video", "Watch lots of movies, discount for prime members!", 10, "Video Streaming",
+                             None, 30, "amazon.com"),
+
+        Digital_Product("Amazon Gift Card", "Spend on all your favorite Amazon products.", 30, "Gift Cards", "@c0de"),
+        Digital_Product("Outback", "Eat more steak.", 30, "Gift Cards", "steaksrgood"),
+
+        Digital_Product("Skyrim", "Best selling open world RPG of all time.", 20, "Steam Codes", "code"),
+        Digital_Product("Dishonored", "Play as an assassin protecting his legacy.", 20, "Steam Codes", "acode"),
+
+        Digital_Product("The Catcher in the Rye", "by JD. Salinger", 20, "E-books", "code"),
+        Digital_Product("Hitchhikers Guide to the Galaxy", "by Douglas Adams", 20, "E-books", "code")
+    ]
+    s.add_administrator("System_Admin", "11000110101010010101110101111")
+    s.user_login("System_Admin", "11000110101010010101110101111")
+    for i in products:
+        s.add_product(i)
+    s.user_logout()
+
     while True:
         if login_menu():
             if type(s.current_user) is Administrator:

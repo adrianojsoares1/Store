@@ -5,7 +5,7 @@ from datetime import date
 
 class Subscription_Product(Product):
 
-    def __init__(self, name="null", description="none", price=-999, category="none", delivery="none",
+    def __init__(self, name="null", description="none", price=-999, category="none",
                  image=None, subscription_length = -1, download_link = "null"):
 
         Product.__init__(self,name,description,price,category,"instant",image)

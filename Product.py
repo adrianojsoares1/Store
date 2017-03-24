@@ -55,7 +55,7 @@ class Product(object):
         self.image = img
 
     def to_string(self):
-        return "Name", self.name, "\nPrice", self.price, "\nDepartment", self.category
+        return "Name: " + str(self.name) + " | Price: " +  str(self.price) + " | Description: " + str(self.description)
 
     def valid_class(self):
         return True
