@@ -116,7 +116,9 @@ class Store:
     def restock(self, product, new_quantity):
         try:
             self.check_permission()
-            product.set_quantity((product.get_quantity + new_quantity))
+            print("Original Quantity:", product.get_quantity(), "|New Quantity:", new_quantity, "|Final:",
+                  product.get_quantity() + new_quantity)
+            product.set_quantity((product.get_quantity() + new_quantity))
         except PermissionError as e:
             print(e)
 

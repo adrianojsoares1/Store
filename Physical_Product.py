@@ -8,12 +8,6 @@ class Physical_Product(Product):
         Product.__init__(self, name, description, price, category, "shipping", image)
         self.quantity = quantity
 
-    def get_ship_time(self):
-        return self.ship_time
-
-    def set_ship_time(self, new_time):
-        self.ship_time = new_time
-
     def set_quantity(self, new):
         self.quantity = new
 

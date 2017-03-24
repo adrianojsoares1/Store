@@ -16,6 +16,7 @@ def login_menu():
             pss = input("Enter password:")
             a_str = s.user_login(user, pss)
             if a_str == "Login Successful":
+                print(a_str, '.')
                 return True
             print(a_str)
         elif choice == 2:
@@ -47,6 +48,7 @@ def customer_main_menu():
         elif choice == 4:
             view_cart_menu()
         elif choice == 5:
+            s.user_logout()
             break
 
 
@@ -112,10 +114,10 @@ def view_cart_menu():
 
 
 def admin_menu():
-    print("\nMain Menu.\n")
     while True:
+        print("\nMain Menu.\n")
         choice = int(input("1.Add category\n2.Delete category\n3.Set a price\n4.Add a product\n5.Delete a product\n"
-                           "6.View Logs\n7.Set Product Category\n8.Quit\n\nEnter:"))
+                           "6.View Logs\n7.Set Product Category\n8.Restock item\n9.Quit\n\nEnter:"))
         if choice == 1:
             add_category_menu()
         elif choice == 2:
@@ -131,6 +133,9 @@ def admin_menu():
         elif choice == 7:
             set_category_menu()
         elif choice == 8:
+            restock_item_menu()
+        elif choice == 9:
+            s.user_logout()
             break
 
 
@@ -140,16 +145,18 @@ def add_category_menu():
         new_cat = input("Enter new category:")
         if master_cat == 1:
             s.add_category("Physical", new_cat)
+            print(new_cat, "was added as a category.")
             break
         elif master_cat == 2:
             s.add_category("Subscription", new_cat)
+            print(new_cat, "was added as a category.")
             break
         elif master_cat == 3:
             s.add_category("Digital", new_cat)
+            print(new_cat, "was added as a category.")
             break
         elif master_cat == 4:
             break
-        print(new_cat, "was added as a category.")
 
 
 def delete_category_menu():
@@ -163,6 +170,7 @@ def delete_category_menu():
                 tmpi = i
     if tmpi != "" and tmpj != "":
         del s.categories[tmpi][tmpj]
+        print(new_cat, "was deleted as a category.")
     else:
         print("Did not find category.")
 
@@ -175,6 +183,8 @@ def set_price_menu():
             for k in s.categories[i][j]:
                 if k.get_name() == name:
                     k.set_price(new_price)
+                    temp = k.get_price()
+                    print("New price for", name, ":", temp)
                     return True
     print("Not found.")
     return False
@@ -187,8 +197,17 @@ def set_category_menu():
         for j in s.categories[i]:
             for k in s.categories[i][j]:
                 if k.get_name() == name:
-                    k.set_category(new_cat)
-                    return True
+                    for f in s.categories[i]:
+                        if new_cat == f:
+                            k.set_category(new_cat)
+                            s.categories[i][j].remove(k)
+                            s.categories[i][f].append(k)
+                            temp = k.get_category()
+                            print("New Category for", name, ":", temp)
+                            return True
+                    else:
+                        print("New category doesn't exist.")
+                        return False
     print("Not found.")
     return False
 
@@ -200,8 +219,24 @@ def delete_item_menu():
             for k in s.categories[i][j]:
                 if k.get_name() == name:
                     s.categories[i][j].remove(k)
+                    print(name, "has been deleted from", j)
                     return True
     print("Not found.")
+    return False
+
+
+def restock_item_menu():
+    name = input("\nEnter product name:")
+    amt = int(input("By how much?:"))
+    for i in s.categories:
+        for j in s.categories[i]:
+            for k in range(0,len(s.categories[i][j])):
+                if s.categories[i][j][k].get_name() == name:
+                    s.restock(s.categories[i][j][k], amt)
+                    temp = s.categories[i][j][k]
+                    print("New Amount for", name, ":", temp.get_quantity())
+                    return True
+    print("Not found, or item does not have value \"Stock\".")
     return False
 
 
@@ -217,6 +252,7 @@ def add_item_menu():
             cat = input("Enter category:")
             if s.categories["Physical"].get(cat) is not None:
                 s.categories["Physical"][cat].append(Physical_Product(quant, name, desc, price, cat))
+                print("Physical_Product object", name, "has been created and added to the category", cat)
                 break
             else:
                 print("Invalid Category.")
@@ -227,6 +263,7 @@ def add_item_menu():
             cat = input("Enter category:")
             if s.categories["Subscription"].get(cat) is not None:
                 s.categories["Subscription"][cat].append(Subscription_Product(name, desc, price, cat, lng, key))
+                print("Subscription_Product object", name, "has been created and added to the category", cat)
                 break
             else:
                 print("Invalid Category.")
@@ -236,6 +273,7 @@ def add_item_menu():
             cat = input("Enter category:")
             if s.categories["Digital"].get(cat) is not None:
                 s.categories["Digital"][cat].append(Physical_Product(name, desc, price, cat, None, quant))
+                print("Digital_Product object", name, "has been created and added to the category", cat)
                 break
             else:
                 print("Invalid Category.")
@@ -243,9 +281,12 @@ def add_item_menu():
 
 if __name__ == "__main__":
     s.add_administrator("me", "pass")
-    if login_menu():
-        if type(s.current_user) is Administrator:
-            admin_menu()
-        elif type(s.current_user) is Customer:
-            customer_main_menu()
-
+    s.add_customer("adr", "pet")
+    while True:
+        if login_menu():
+            if type(s.current_user) is Administrator:
+                admin_menu()
+            elif type(s.current_user) is Customer:
+                customer_main_menu()
+        else:
+            break
