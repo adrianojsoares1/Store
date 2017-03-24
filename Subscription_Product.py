@@ -6,13 +6,12 @@ from datetime import date
 class Subscription_Product(Product):
 
     def __init__(self, name="null", description="none", price=-999, category="none", delivery="none",
-                 image=None, subscription_length = -1, download_link = "null", Product_Key = "null"):
+                 image=None, subscription_length = -1, download_link = "null"):
 
         Product.__init__(self,name,description,price,category,"instant",image)
 
         self.sub_length = subscription_length
         self.download_link = download_link
-        self.product_key = Product_Key
         now = datetime.datetime.utcnow()
         self.start_date = date(now.year, now.month, now.day)
 

@@ -1,7 +1,9 @@
 from Web_Store.Store import Store
 from Web_Store.Administrator import Administrator
 from Web_Store.Customer import Customer
-
+from Web_Store.Physical_Product import Physical_Product
+from Web_Store.Digital_Product import Digital_Product
+from Web_Store.Subscription_Product import Subscription_Product
 s = Store()
 
 
@@ -32,8 +34,9 @@ def login_menu():
 
 
 def customer_main_menu():
+    print("Main Menu.")
     while True:
-        choice = int(input("Enter 1 to shop\nEnter 2 to add money\nEnter 3 to change password\nEnter 4 to view cart\n"
+        choice = int(input("\nEnter 1 to shop\nEnter 2 to add money\nEnter 3 to change password\nEnter 4 to view cart\n"
                            "Enter 5 to logout."))
         if choice == 1:
             shop_menu()
@@ -48,6 +51,7 @@ def customer_main_menu():
 
 
 def shop_menu():
+    print("\nShop Menu.")
     dictry = s.get_categories()
     count = 1
     keys = []
@@ -108,8 +112,10 @@ def view_cart_menu():
 
 
 def admin_menu():
+    print("\nMain Menu.\n")
     while True:
-        choice = int(input("1.Add category\n2.Delete category\n3.Set a price\n4.View Logs\n5.Set Product Category"))
+        choice = int(input("1.Add category\n2.Delete category\n3.Set a price\n4.Add a product\n5.Delete a product\n"
+                           "6.View Logs\n7.Set Product Category\n8.Quit\n\nEnter:"))
         if choice == 1:
             add_category_menu()
         elif choice == 2:
@@ -117,10 +123,14 @@ def admin_menu():
         elif choice == 3:
             set_price_menu()
         elif choice == 4:
-            pass
+            add_item_menu()
         elif choice == 5:
-            set_category_menu()
+            delete_item_menu()
         elif choice == 6:
+            pass
+        elif choice == 7:
+            set_category_menu()
+        elif choice == 8:
             break
 
 
@@ -143,7 +153,7 @@ def add_category_menu():
 
 
 def delete_category_menu():
-    new_cat = input("Enter category to delete:")
+    new_cat = input("\nEnter category to delete:")
     tmpi = ""
     tmpj = ""
     for i in s.categories:
@@ -158,39 +168,77 @@ def delete_category_menu():
 
 
 def set_price_menu():
-    name = input("Enter product name:")
+    name = input("\nEnter product name:")
     new_price = int(input("Enter new price:"))
     for i in s.categories:
         for j in s.categories[i]:
             for k in s.categories[i][j]:
                 if k.get_name() == name:
                     k.set_price(new_price)
+                    return True
     print("Not found.")
+    return False
 
 
 def set_category_menu():
-    name = input("Enter product name:")
+    name = input("\nEnter product name:")
     new_cat = input("Enter new category:")
     for i in s.categories:
         for j in s.categories[i]:
             for k in s.categories[i][j]:
                 if k.get_name() == name:
                     k.set_category(new_cat)
+                    return True
     print("Not found.")
+    return False
 
 
 def delete_item_menu():
-    name = input("Enter product name:")
+    name = input("\nEnter product name:")
     for i in s.categories:
         for j in s.categories[i]:
             for k in s.categories[i][j]:
                 if k.get_name() == name:
                     s.categories[i][j].remove(k)
+                    return True
     print("Not found.")
+    return False
 
 
 def add_item_menu():
-    name = input("Enter product name:")
+    name = input("\nEnter product name:")
+    desc = input("Enter product description:")
+    price = int(input("Enter item price:"))
+
+    kind = int(input("Is new product...\n1.Physical\n2.Subscription\n3.Digital\nEnter:"))
+    if kind == 1:
+        quant = int(input("Enter quantity:"))
+        while True:
+            cat = input("Enter category:")
+            if s.categories["Physical"].get(cat) is not None:
+                s.categories["Physical"][cat].append(Physical_Product(quant, name, desc, price, cat))
+                break
+            else:
+                print("Invalid Category.")
+    elif kind == 2:
+        while True:
+            lng = int(input("Enter subscription length:"))
+            key = input("Enter product download key:")
+            cat = input("Enter category:")
+            if s.categories["Subscription"].get(cat) is not None:
+                s.categories["Subscription"][cat].append(Subscription_Product(name, desc, price, cat, lng, key))
+                break
+            else:
+                print("Invalid Category.")
+    elif kind == 3:
+        quant = int(input("Enter product code:"))
+        while True:
+            cat = input("Enter category:")
+            if s.categories["Digital"].get(cat) is not None:
+                s.categories["Digital"][cat].append(Physical_Product(name, desc, price, cat, None, quant))
+                break
+            else:
+                print("Invalid Category.")
 
 
 if __name__ == "__main__":
